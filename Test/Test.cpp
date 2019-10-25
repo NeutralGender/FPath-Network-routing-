@@ -39,6 +39,8 @@ private:
 	vector<vector<int>>a; // weight matrix
 	vector<vector<int>>h; // history matrix
 
+	vector<vector<int>> vtm;
+
 protected:
 
 };
@@ -109,6 +111,8 @@ void FPath::make_matrix()
 			}
 		}
 	}
+
+	vtm = (a);
 
 }
 
@@ -199,52 +203,73 @@ void FPath::task2()
 	wr.write_into_file(v_task2);
 }
 
+
+
+bool add_if_not_exist(vector<pair<string, string>> v_task4, string stemp, string unique_addr)
+{
+	for (size_t i = 0; i < v_task4.size(); ++i)
+	{
+		// path is exist in routing table
+		if (v_task4[i] == std::make_pair(stemp, unique_addr) ||
+			v_task4[i] == std::make_pair(unique_addr, stemp))
+			return 0;
+	}
+	// path is not exist in table, so we add it to vector for output(task4)
+	return true;
+}
+
+void add_to_vector(vector<vector<int>>h, int i, int j, vector<string>unique_addr, vector<pair<string, string>>& v_task4)
+{
+	int x = h[i][j];
+	string stemp = unique_addr[i];
+	do
+	{
+		if (add_if_not_exist(v_task4, stemp, unique_addr[x]))
+			v_task4.push_back(std::make_pair(stemp, unique_addr[x]));
+		stemp = unique_addr[x];
+		int temp = h[x][j];
+		x = temp;
+	} while (x);
+}
+
+
 bool FPath::task4()
 {
 	cout << "\ntask4:\nTest\\Test\\task4.txt\n";
 
 	Write wr(path_write_task4);
 
-	vector<bool> used( unique_addr.size() ); // show is v(V) is in spanning tree
-	vector<int> min_e(unique_addr.size(), INF), // store weight of min edge(E) from V
-				sel_e(unique_addr.size(), -1); // store next V of current min E
-	vector<pair<string, string>> v_task4; // vector for output in file
-
-	min_e[0] = 0;
-
-	for (size_t i = 0; i < unique_addr.size(); ++i)
+	for (int i = 0; i < unique_addr.size(); i++)
 	{
-		int v = -1;
-		for (int j = 0; j < unique_addr.size(); ++j)
+		for (int j = 0; j < unique_addr.size(); j++)
 		{
-			if (!used[j] && (v == - 1 || min_e[j] < min_e[v]))
-				v = j;
-		}
-
-		if (min_e[v] == INF)
-		{
-			cout << "No MST\n";
-			return 0;
-		}
-
-		used[v] = true; // add to spanning tree
-		if (sel_e[v] != -1)
-		{
-			v_task4.push_back(std::make_pair(unique_addr[v], unique_addr[sel_e[v]]));
-		}
-
-		for (size_t to = 0; to < unique_addr.size(); ++to)
-		{
-			if (a[v][to] < min_e[to])
+			if (a[i][j] > 2)
 			{
-				min_e[to] = a[v][to];
-				sel_e[to] = v;
+				a[i][j] = 1;
+				a[j][i] = 1;
+
+				h[i][j] = j;
+				h[j][i] = 0;
 			}
 		}
 	}
 
+	vector<pair<string, string>> v_task4;
+	for (size_t i = 0; i < unique_addr.size(); ++i)
+	{
+		for (size_t j = 0; j < unique_addr.size(); ++j)
+		{
+			if (i != j)
+			{
+				add_to_vector(h, i, j, unique_addr, v_task4);
+			}
+		}
+	}
 	// WRITE INTO FILE: Test\Test\task4.txt
 	wr.write_into_file(v_task4);
+
+
+	return 0;
 }
 
 

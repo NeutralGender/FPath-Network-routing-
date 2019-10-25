@@ -1,4 +1,4 @@
 ﻿  Test.cpp
-C:\Users\Gennady\source\repos\Test\Test\Test.cpp(218,21): warning C4018:  <: несоответствие типов со знаком и без знака
-C:\Users\Gennady\source\repos\Test\Test\Test.cpp(248): warning C4715:  FPath::task4: значение возвращается не при всех путях выполнения
+C:\Users\Gennady\source\repos\Test\Test\Test.cpp(260,20): warning C4018:  <: несоответствие типов со знаком и без знака
+C:\Users\Gennady\source\repos\Test\Test\Test.cpp(262,21): warning C4018:  <: несоответствие типов со знаком и без знака
   Test.vcxproj -> C:\Users\Gennady\source\repos\Test\Debug\Test.exe

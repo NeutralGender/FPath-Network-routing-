@@ -39,8 +39,6 @@ private:
 	vector<vector<int>>a; // weight matrix
 	vector<vector<int>>h; // history matrix
 
-	vector<vector<int>> vtm;
-
 protected:
 
 };
@@ -111,9 +109,6 @@ void FPath::make_matrix()
 			}
 		}
 	}
-
-	vtm = (a);
-
 }
 
 void FPath::floyd_algo()

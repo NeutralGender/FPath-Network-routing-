@@ -26,11 +26,12 @@ public:
 	void find(string, string);
 	void task2();
 	void task3();
-	void task4();
+	bool task4();
+
 
 private:
 	const int INF;
-	const string path;// = "D:\\Telegram Downloads\\fpath\\G1.csv";
+	const string path; // path for raw data
 	const string path_write_task4;
 	const string path_write_task2;
 	vector<pair<string, string>> link_addr; //vector for pair<address,address>
@@ -138,7 +139,9 @@ void FPath::find(string from, string to)
 
 	cout << "From :" << from << " -> " << to << endl;
 
-	cout << "Hops count: " << a[cit_from - unique_addr.cbegin()][cit_to - unique_addr.cbegin()] << endl;
+	cout << "PING " + to + "(" + to + ") 56 bytes of data.\n";
+	cout << "64 bytes from " + to + ": icmp_req=1 ttl=" << 2 * a[cit_from - unique_addr.cbegin()][cit_to - unique_addr.cbegin()]
+		<< " time=" << 2 * 2 * a[cit_from - unique_addr.cbegin()][cit_to - unique_addr.cbegin()] << endl;
 
 }
 
@@ -196,59 +199,54 @@ void FPath::task2()
 	wr.write_into_file(v_task2);
 }
 
-bool add_if_not_exist(vector<pair<string, string>> v_task4, string stemp, string unique_addr)
+bool FPath::task4()
 {
-	for (size_t i = 0; i < v_task4.size(); ++i)
-	{
-		// path is exist in routing table
-		if (v_task4[i] == std::make_pair(stemp, unique_addr) ||
-			v_task4[i] == std::make_pair(unique_addr, stemp) ) 
-			return 0;
-	}
-	// path is not exist in table, so we add it to vector for output(task4)
-	return true;
-}
-
-void add_to_vector(vector<vector<int>>h ,int i, int j ,vector<string>unique_addr, vector<pair<string, string>> &v_task4)
-{
-	int x = h[i][j];
-	string stemp = unique_addr[i];
-	
-	do
-	{
-		if (add_if_not_exist(v_task4, stemp, unique_addr[x]))
-			v_task4.push_back(std::make_pair(stemp, unique_addr[x]));
-
-		stemp = unique_addr[x];
-		int temp = h[x][j];
-		x = temp;
-
-	} while (x);
-}
-
-void FPath::task4()
-{
-	cout << "\ntask4: Test\\Test\\task4.txt\n";
+	cout << "\ntask4:\nTest\\Test\\task4.txt\n";
 
 	Write wr(path_write_task4);
 
-	vector<pair<string, string>> v_task4;
+	vector<bool> used( unique_addr.size() ); // show is v(V) is in spanning tree
+	vector<int> min_e(unique_addr.size(), INF), // store weight of min edge(E) from V
+				sel_e(unique_addr.size(), -1); // store next V of current min E
+	vector<pair<string, string>> v_task4; // vector for output in file
+
+	min_e[0] = 0;
 
 	for (size_t i = 0; i < unique_addr.size(); ++i)
 	{
-		for (size_t j = 0; j < unique_addr.size(); ++j)
+		int v = -1;
+		for (int j = 0; j < unique_addr.size(); ++j)
 		{
-			if (i != j)
+			if (!used[j] && (v == - 1 || min_e[j] < min_e[v]))
+				v = j;
+		}
+
+		if (min_e[v] == INF)
+		{
+			cout << "No MST\n";
+			return 0;
+		}
+
+		used[v] = true; // add to spanning tree
+		if (sel_e[v] != -1)
+		{
+			v_task4.push_back(std::make_pair(unique_addr[v], unique_addr[sel_e[v]]));
+		}
+
+		for (size_t to = 0; to < unique_addr.size(); ++to)
+		{
+			if (a[v][to] < min_e[to])
 			{
-				add_to_vector(h, i, j, unique_addr, v_task4);
+				min_e[to] = a[v][to];
+				sel_e[to] = v;
 			}
 		}
 	}
 
 	// WRITE INTO FILE: Test\Test\task4.txt
 	wr.write_into_file(v_task4);
-
 }
+
 
 int main()
 {
